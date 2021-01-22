@@ -1,0 +1,40 @@
+version: '2'
+services:
+  mysql:
+    image: mysql:5.7
+    environment:
+      MYSQL_DATABASE: outlands_civicrm
+      MYSQL_ALLOW_EMPTY_PASSWORD: 1
+      MYSQL_ROOT_PASSWORD: 12345
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./etc/mysql:/docker-entrypoint-initdb.d
+  app:
+    build: ./
+    image: sca/outlands-civicrm:latest
+    container_name: outlands_civicrm
+    ports:
+      - 8080:80
+    volumes:
+      - ./etc:/mnt/etc
+      - ./src:/var/www/html
+    volumes_from:
+      - mysql
+    restart: always
+    environment:
+      DRUPAL_DB_NAME: outlands_civicrm
+      DRUPAL_DB_USER: root
+      DRUPAL_DB_HOST: mysql
+      DRUPAL_DB_PASSWORD: 12345
+      DRUPAL_DB_PORT: 3306
+      CIVICRM_DB_NAME: outlands_civicrm
+      CIVICRM_DB_USER: root
+      CIVICRM_DB_PASS: 12345
+      CIVICRM_DB_HOST: mysql
+      CIVICRM_DB_PORT: 3306
+      BASE_URL: http://localhost
+      BASE_PATH: /var/www/html
+      ROOT_PATH: /var/www/html/web
+      CONF_PATH: /mnt/etc
+
